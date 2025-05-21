@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+  namespace: default
+type: Opaque
+data:
+  # Replace with base64-encoded values
+  username: dXNlcm5hbWU=
+  password: cGFzc3dvcmQ=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+  labels:
+    app: todo-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      containers:
+      - name: todo-app
+        image: nginx:latest # Replace with your app image
+        ports:
+        - containerPort: 80
+        env:
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-app-service
+spec:
+  selector:
+    app: todo-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
