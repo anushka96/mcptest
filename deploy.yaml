@@ -54,3 +54,15 @@ spec:
       port: 80
       targetPort: 80
   type: ClusterIP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-pod
+  labels:
+    app: busybox
+spec:
+  containers:
+  - name: busybox
+    image: busybox:latest
+    command: ["sleep", "3600"]
